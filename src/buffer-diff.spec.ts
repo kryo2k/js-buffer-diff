@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import 'mocha';
 
-import { diff, commit, revert, IBufferChange } from './buffer-diff';
+import { diff, commit, revert, canCommit, canRevert, IBufferChange } from './buffer-diff';
 
 const
 B  = new Buffer([]),
@@ -141,6 +141,32 @@ describe('diff', () => {
     expect(changes[1].left).to.deep.eq(BZZO);
     expect(changes[1].right).to.deep.eq(B);
   });
+});
+
+describe('canCommit', () => {
+  it('can commit a simple test', () => {
+
+    const
+    target = new Buffer([0,1,2,3,4]),
+    change = { index: 0, left: new Buffer([0,1,2]), right: Buffer.allocUnsafe(0) };
+
+    expect(canCommit(target, change));
+  });
+
+  // TODO: i'll add more test cases later
+});
+
+describe('canRevert', () => {
+  it('can revert a simple test', () => {
+
+    const
+    target = new Buffer([2,1,0,3,4]),
+    change = { index: 0, left: new Buffer([0,1,2]), right: Buffer.allocUnsafe(0) };
+
+    expect(canRevert(target, change));
+  });
+
+  // TODO: i'll add more test cases later
 });
 
 describe('commit', () => {

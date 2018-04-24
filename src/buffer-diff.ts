@@ -83,6 +83,22 @@ export function diff(a : Buffer, b : Buffer) : IBufferChange[] {
 };
 
 /**
+* Determines if a change is possible on target or not.
+*/
+export function canCommit(target : Buffer, change : IBufferChange) : boolean {
+  const { index, left } = change;
+  return target.slice(index, index + left.length).equals(left);
+};
+
+/**
+* Determines if a change can be reverted from target.
+*/
+export function canRevert(target : Buffer, change : IBufferChange) : boolean {
+  const { index, right } = change;
+  return target.slice(index, index + right.length).equals(right);
+};
+
+/**
 * Latest generation commit algorithm. Takes all changes provided and applies them
 * to the target provided. If change does not line up with target exactly, it will throw
 * an error.
@@ -92,11 +108,9 @@ export function commit(target : Buffer, ... changes: IBufferChange[]) : Buffer {
 
     const
     { index, left, right } = change,
-    lengthLeft  = left.length,
-    lengthRight = right.length,
-    lengthDelta = lengthRight - lengthLeft;
+    lengthDelta = right.length - left.length;
 
-    if(!target.slice(index, index + lengthLeft).equals(left))
+    if(!canCommit(target, change))
       throw new Error('Unable to commit change.');
 
     target = resize(target, index, lengthDelta);
@@ -118,12 +132,11 @@ export function revert(target : Buffer, ... changes : IBufferChange[]) : Buffer 
   while(cursor > -1) {
 
     const
-    { index, left, right } = changes[cursor],
-    lengthLeft  = left.length,
-    lengthRight = right.length,
-    lengthDelta = lengthLeft - lengthRight;
+    change = changes[cursor],
+    { index, left, right } = change,
+    lengthDelta = left.length - right.length;
 
-    if(!target.slice(index, index + lengthRight).equals(right))
+    if(!canRevert(target, change))
       throw new Error('Unable to revert change.');
 
     target = resize(target, index, lengthDelta);

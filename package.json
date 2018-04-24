@@ -1,6 +1,6 @@
 {
   "name": "js-buffer-diff",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Typescript utility functions to create, commit and revert a diff of two buffer objects.",
   "main": "node index.js",
   "scripts": {
