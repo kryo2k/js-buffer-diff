@@ -92,6 +92,20 @@ describe('diff', () => {
         chai_1.expect(changes[1].right).to.deep.eq(B);
     });
 });
+describe('canCommit', () => {
+    it('can commit a simple test', () => {
+        const target = new Buffer([0, 1, 2, 3, 4]), change = { index: 0, left: new Buffer([0, 1, 2]), right: Buffer.allocUnsafe(0) };
+        chai_1.expect(buffer_diff_1.canCommit(target, change));
+    });
+    // TODO: i'll add more test cases later
+});
+describe('canRevert', () => {
+    it('can revert a simple test', () => {
+        const target = new Buffer([2, 1, 0, 3, 4]), change = { index: 0, left: new Buffer([0, 1, 2]), right: Buffer.allocUnsafe(0) };
+        chai_1.expect(buffer_diff_1.canRevert(target, change));
+    });
+    // TODO: i'll add more test cases later
+});
 describe('commit', () => {
     it('Can commit diff | [0] ==> []', () => {
         const changes = buffer_diff_1.diff(BZ, B), committed = buffer_diff_1.commit(BZ, ...changes);

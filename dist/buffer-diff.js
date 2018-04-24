@@ -50,14 +50,32 @@ function diff(a, b) {
 exports.diff = diff;
 ;
 /**
+* Determines if a change is possible on target or not.
+*/
+function canCommit(target, change) {
+    const { index, left } = change;
+    return target.slice(index, index + left.length).equals(left);
+}
+exports.canCommit = canCommit;
+;
+/**
+* Determines if a change can be reverted from target.
+*/
+function canRevert(target, change) {
+    const { index, right } = change;
+    return target.slice(index, index + right.length).equals(right);
+}
+exports.canRevert = canRevert;
+;
+/**
 * Latest generation commit algorithm. Takes all changes provided and applies them
 * to the target provided. If change does not line up with target exactly, it will throw
 * an error.
 */
 function commit(target, ...changes) {
     changes.forEach(change => {
-        const { index, left, right } = change, lengthLeft = left.length, lengthRight = right.length, lengthDelta = lengthRight - lengthLeft;
-        if (!target.slice(index, index + lengthLeft).equals(left))
+        const { index, left, right } = change, lengthDelta = right.length - left.length;
+        if (!canCommit(target, change))
             throw new Error('Unable to commit change.');
         target = resize(target, index, lengthDelta);
         right.copy(target, index);
@@ -74,8 +92,8 @@ function revert(target, ...changes) {
     const length = changes.length;
     let cursor = length - 1;
     while (cursor > -1) {
-        const { index, left, right } = changes[cursor], lengthLeft = left.length, lengthRight = right.length, lengthDelta = lengthLeft - lengthRight;
-        if (!target.slice(index, index + lengthRight).equals(right))
+        const change = changes[cursor], { index, left, right } = change, lengthDelta = left.length - right.length;
+        if (!canRevert(target, change))
             throw new Error('Unable to revert change.');
         target = resize(target, index, lengthDelta);
         left.copy(target, index);

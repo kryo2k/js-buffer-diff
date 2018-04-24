@@ -18,6 +18,14 @@ export declare function resize(buffer: Buffer, index: number, delta: number, fil
 */
 export declare function diff(a: Buffer, b: Buffer): IBufferChange[];
 /**
+* Determines if a change is possible on target or not.
+*/
+export declare function canCommit(target: Buffer, change: IBufferChange): boolean;
+/**
+* Determines if a change can be reverted from target.
+*/
+export declare function canRevert(target: Buffer, change: IBufferChange): boolean;
+/**
 * Latest generation commit algorithm. Takes all changes provided and applies them
 * to the target provided. If change does not line up with target exactly, it will throw
 * an error.
